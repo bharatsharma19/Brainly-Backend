@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { random } from "./utils";
 import { ContentModel, LinkModel, UserModel } from "./db";
-import { JWT_PASSWORD } from "./config";
 import { userMiddleware } from "./middleware";
 
 const app = express();
@@ -28,7 +27,10 @@ app.post("/api/v1/signup", async (req: any, res: any) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await UserModel.create({ username, name, email, password: hashedPassword });
 
-    res.json({ message: "User signed up successfully" });
+    // Return a token
+    const token = jwt.sign({ username }, process.env.JWT_PASSWORD || "Secret");
+
+    res.json({ token });
   } catch (error) {
     res.status(409).json({ message: "User already exists" });
   }
@@ -53,7 +55,10 @@ app.post("/api/v1/signin", async (req: any, res: any) => {
     return res.status(403).json({ message: "Incorrect credentials" });
   }
 
-  const token = jwt.sign({ id: existingUser._id }, JWT_PASSWORD);
+  const token = jwt.sign(
+    { id: existingUser._id },
+    process.env.JWT_PASSWORD || "Secret"
+  );
   res.json({ token });
 });
 
