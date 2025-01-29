@@ -46,24 +46,27 @@ app.post("/api/v1/signin", async (req: any, res: any) => {
   const existingUser = await UserModel.findOne({ username });
 
   if (!existingUser || !existingUser.password) {
-    return res.status(403).json({ message: "Incorrect credentials" });
+    return res.status(403).json({ message: "Incorrect username" });
   }
 
   const isPasswordValid = await bcrypt.compare(password, existingUser.password);
 
   if (!isPasswordValid) {
-    return res.status(403).json({ message: "Incorrect credentials" });
+    return res.status(403).json({ message: "Incorrect password" });
   }
 
   const token = jwt.sign(
     { id: existingUser._id },
     process.env.JWT_PASSWORD || "Secret"
   );
+
   res.json({ token });
 });
 
 app.post("/api/v1/content", userMiddleware, async (req: any, res: any) => {
   const { link, type, title } = req.body;
+
+  
 
   await ContentModel.create({
     link,
@@ -138,7 +141,12 @@ app.get("/api/v1/brain/:shareLink", async (req: any, res: any) => {
   res.json({ username: user.username, content });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server started on http://localhost:${PORT}`);
-});
+// This block ensures the server is started only when this file is executed directly (not in tests)
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server started on http://localhost:${PORT}`);
+  });
+}
+
+export { app }; // Export the app instance for testing purposes
