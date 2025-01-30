@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "brainly-backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -9,8 +9,8 @@
     "test": "jest"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Bharat Sharma",
+  "license": "MIT",
   "type": "commonjs",
   "description": "",
   "dependencies": {
